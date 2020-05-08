@@ -10,8 +10,6 @@ document.addEventListener('DOMContentLoaded', function (event) {
     .append('svg')
     .attr('width', width)
     .attr('height', height)
-    .append('g')
-    .attr('class', 'map')
 
   // projection setup
   const projection = d3.geoRobinson()
@@ -35,6 +33,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
   ]).then((res) => {
     // world data for map drawing
     const world = res[0]
+    world.features = world.features.filter(v => v.id !== 'ATA')
     // covid19 data
     const data = res[1].data
       .map(v => {
@@ -43,26 +42,17 @@ document.addEventListener('DOMContentLoaded', function (event) {
         return v
       })
 
-    const rates = data.map(v => v.cases)
-    const maxRate = Math.max(...rates)
-    const minRate = Math.min(...rates)
-    const step = (maxRate - minRate) / 9
     const color = d3.scaleThreshold()
       .domain([
-        minRate,
-        minRate + step,
-        minRate + step * 2,
-        minRate + step * 3,
-        minRate + step * 4,
-        minRate + step * 5,
-        minRate + step * 6,
-        minRate + step * 7,
-        minRate + step * 8,
-        maxRate
+        5,
+        10,
+        50,
+        100,
+        500,
+        1000,
+        2000
       ])
       .range([
-        'rgb(247,251,255)',
-        'rgb(222,235,247)',
         'rgb(198,219,239)',
         'rgb(158,202,225)',
         'rgb(107,174,214)',
@@ -73,11 +63,12 @@ document.addEventListener('DOMContentLoaded', function (event) {
         'rgb(3,19,43)'
       ])
 
+    // map
     const dates = data
       .map(v => v.date)
       .filter((value, index, self) => self.indexOf(value) === index)
       .sort((a, b) => new Date(a) - new Date(b))
-    let selectedDate = dates[0]
+    let selectedDate = dates[dates.length - 1]
 
     function redraw () {
       svg.selectAll('g.countries').remove()
@@ -92,9 +83,10 @@ document.addEventListener('DOMContentLoaded', function (event) {
         .attr('class', 'countries')
         .selectAll('path')
         .data(world.features)
-        .enter().append('path')
+        .enter()
+        .append('path')
         .attr('d', path)
-        .style('fill', d => dataByName[d.id] ? color(dataByName[d.id]) : '#eee')
+        .style('fill', d => dataByName[d.id] ? color(dataByName[d.id]) : 'rgb(198,219,239)')
         .style('stroke', 'white')
         .style('opacity', 0.8)
         .style('stroke-width', 0.3)
@@ -114,6 +106,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
 
     redraw()
 
+    document.getElementById('date').textContent = dates[dates.length - 1]
     let tickIndex = 0
     const slider = d3
       .sliderRight()
@@ -121,11 +114,12 @@ document.addEventListener('DOMContentLoaded', function (event) {
       .tickValues(Array.from(dates.keys()))
       .step(1)
       .height(400)
-      .default(0)
       .tickFormat(d => ++tickIndex % 10 === 0 ? dates[d] : null)
       .displayFormat(d => dates[d])
+      .default(dates.length - 1)
       .on('onchange', d => {
         selectedDate = dates[d]
+        document.getElementById('date').textContent = dates[d]
         redraw()
       })
 
@@ -133,5 +127,16 @@ document.addEventListener('DOMContentLoaded', function (event) {
       .append('g')
       .attr('transform', 'translate(30,30)')
       .call(slider)
+
+    const legend = svg.append('g')
+      .attr('class', 'legendQuant')
+      .attr('transform', 'translate(180,450)')
+
+    legend.call(d3.legendColor()
+      .orient('horizontal')
+      .shapeWidth(80)
+      .labelFormat(d3.format('i'))
+      .labels(d3.legendHelpers.thresholdLabels)
+      .scale(color))
   })
 })
