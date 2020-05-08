@@ -1,3 +1,14 @@
+const colors = [
+  'rgb(198,219,239)',
+  'rgb(158,202,225)',
+  'rgb(107,174,214)',
+  'rgb(66,146,198)',
+  'rgb(33,113,181)',
+  'rgb(8,81,156)',
+  'rgb(8,48,107)',
+  'rgb(3,19,43)'
+]
+
 document.addEventListener('DOMContentLoaded', function (event) {
   // sizes
   const margin = { top: 0, right: 0, bottom: 0, left: 0 }
@@ -43,25 +54,8 @@ document.addEventListener('DOMContentLoaded', function (event) {
       })
 
     const color = d3.scaleThreshold()
-      .domain([
-        5,
-        10,
-        50,
-        100,
-        500,
-        1000,
-        2000
-      ])
-      .range([
-        'rgb(198,219,239)',
-        'rgb(158,202,225)',
-        'rgb(107,174,214)',
-        'rgb(66,146,198)',
-        'rgb(33,113,181)',
-        'rgb(8,81,156)',
-        'rgb(8,48,107)',
-        'rgb(3,19,43)'
-      ])
+      .domain([5, 10, 50, 100, 500, 1000, 2000])
+      .range(colors)
 
     // map
     const dates = data
@@ -86,7 +80,7 @@ document.addEventListener('DOMContentLoaded', function (event) {
         .enter()
         .append('path')
         .attr('d', path)
-        .style('fill', d => dataByName[d.id] ? color(dataByName[d.id]) : 'rgb(198,219,239)')
+        .style('fill', d => dataByName[d.id] ? color(dataByName[d.id]) : colors[0])
         .style('stroke', 'white')
         .style('opacity', 0.8)
         .style('stroke-width', 0.3)
