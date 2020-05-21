@@ -10,38 +10,40 @@ const colors = [
 ]
 
 document.addEventListener('DOMContentLoaded', function (event) {
-  // sizes
-  const margin = { top: 0, right: 0, bottom: 0, left: 0 }
-  const width = 960 - margin.left - margin.right
-  const height = 500 - margin.top - margin.bottom
-
-  // svg setup
-  const svg = d3
-    .select('#chart')
-    .append('svg')
-    .attr('width', width)
-    .attr('height', height)
-
-  // projection setup
-  const projection = d3.geoRobinson()
-    .scale(148)
-    .rotate([352, 0, 0])
-    .translate([width / 2, height / 2])
-  const path = d3.geoPath().projection(projection)
-
-  // tooltips setup
-  const tip = d3.tip()
-    .attr('class', 'd3-tip')
-    .offset([-10, 0])
-    .html(d => `<strong>Country: </strong><span class='details'>${d.properties.name}<br></span><strong>Confirmed cases: </strong><span class='details'>${d.case}</span>`)
-  svg.call(tip)
-
   // load datas before init
   Promise.all([
     d3.json('./data/world_countries.json'),
     d3.json('./data/map-data.json'),
     d3.json('./data/iso3.json')
   ]).then((res) => {
+    document.body.innerHTML = '<h1>Total confirmed COVID-19 cases, <span id="date"></span></h1><div id="chart"></div><p>Data source: https://thevirustracker.com/timeline/map-data.json</p>'
+
+    // sizes
+    const margin = { top: 0, right: 0, bottom: 0, left: 0 }
+    const width = 960 - margin.left - margin.right
+    const height = 500 - margin.top - margin.bottom
+
+    // svg setup
+    const svg = d3
+      .select('#chart')
+      .append('svg')
+      .attr('width', width)
+      .attr('height', height)
+
+    // projection setup
+    const projection = d3.geoRobinson()
+      .scale(148)
+      .rotate([352, 0, 0])
+      .translate([width / 2, height / 2])
+    const path = d3.geoPath().projection(projection)
+
+    // tooltips setup
+    const tip = d3.tip()
+      .attr('class', 'd3-tip')
+      .offset([-10, 0])
+      .html(d => `<strong>Country: </strong><span class='details'>${d.properties.name}<br></span><strong>Confirmed cases: </strong><span class='details'>${d.case}</span>`)
+    svg.call(tip)
+
     // world data for map drawing
     const world = res[0]
     world.features = world.features.filter(v => v.id !== 'ATA')
