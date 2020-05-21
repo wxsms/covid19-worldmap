@@ -88,13 +88,11 @@ document.addEventListener('DOMContentLoaded', function (event) {
           tip.show(d, this)
           d3.select(this)
             .style('opacity', 1)
-            .style('stroke-width', 3)
         })
         .on('mouseout', function (d) {
           tip.hide(d)
           d3.select(this, this)
             .style('opacity', 0.8)
-            .style('stroke-width', 0.3)
         })
     }
 
