@@ -1,3 +1,5 @@
-# Covid19 world map
+# Covid19 World Map
 
-![](https://raw.githubusercontent.com/wxsms/xueba-30/master/screenshot.png)
+
+
+![](https://user-images.githubusercontent.com/5960988/82521071-3f523180-9b58-11ea-9a7c-02375c288118.png)
